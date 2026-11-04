@@ -15,7 +15,7 @@ if (!KEY) {
 
 const API = 'https://api.render.com/v1';
 const OWNER = 'GraphicMiles';
-const REPO = 'Game-test';
+const REPO = 'sweetwater';
 const NAME = process.env.RENDER_SERVICE_NAME || 'sweetwater';
 const REGION = process.env.RENDER_REGION || 'oregon';
 const PLAN = process.env.RENDER_PLAN || 'free';
@@ -150,6 +150,6 @@ const statusEmoji = s => ({ live: '🟢', build_failed: '🔴', build_in_progres
   console.error('\n❌ Deploy failed:', e.message);
   if (e.body) console.error('  ', JSON.stringify(e.body).slice(0, 600));
   if (e.status === 401) console.error('   The API key was rejected. Generate a new one at dashboard.render.com → Account Settings → API Keys.');
-  if (e.status === 404) console.error('   Repo not visible to Render. Connect the GitHub account that owns GraphicMiles/Game-test first.');
+  if (e.status === 404) console.error('   Repo not visible to Render. Connect the GitHub account that owns GraphicMiles/sweetwater first.');
   process.exit(1);
 });

@@ -88,14 +88,14 @@ The player is a capsule resolved axis-by-axis against an AABB spatial hash. Two 
 
 **One click** — this is all you need:
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/GraphicMiles/Game-test)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/GraphicMiles/sweetwater)
 
 That link opens Render's blueprint page with this repo pre-filled. `render.yaml` is read
 straight from `main`, so every setting is already correct — just click **Apply** (sign in or
 create a free account first). You'll get a URL like `https://sweetwater.onrender.com` and the
 build takes a couple of minutes.
 
-Manual path, if you prefer: **Render dashboard → New → Blueprint →** pick `GraphicMiles/Game-test`.
+Manual path, if you prefer: **Render dashboard → New → Blueprint →** pick `GraphicMiles/sweetwater`.
 
 What the blueprint sets up:
 
