@@ -2,7 +2,7 @@
 
 ## The link
 
-**https://render.com/deploy?repo=https://github.com/GraphicMiles/Game-test**
+**https://render.com/deploy?repo=https://github.com/GraphicMiles/sweetwater**
 
 Click it. That's step 1.
 
@@ -10,7 +10,7 @@ Click it. That's step 1.
 
 ## What happens when you click it
 
-Render opens its blueprint page with `GraphicMiles/Game-test` already filled in. It reads
+Render opens its blueprint page with `GraphicMiles/sweetwater` already filled in. It reads
 `render.yaml` straight from `main`, so **every setting is already correct** — you don't have to
 type a build command, start command, or health check path.
 
