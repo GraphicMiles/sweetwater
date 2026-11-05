@@ -1,161 +1,105 @@
 # Sweetwater
 
-A first-person recreation of **Sweetwater**, the frontier town from HBO's *Westworld*, built to run in a browser.
-Walk off the train, stroll the length of Main Street, push through the batwing doors of the Mariposa,
-climb the Coronado's staircase and watch the light go gold over the mesas.
+A browser recreation of Sweetwater, the frontier town from Westworld. Walk off
+the train, follow Main Street, push through the batwing doors of the Mariposa,
+climb the Coronado staircase and watch the light go gold over the mesas.
 
-No build step, no bundler, no CDN — plain ES modules and a vendored copy of three.js r160.
+It runs in a browser with no build step and no CDN: plain ES modules and a
+vendored copy of three.js r160.
 
----
+## Why it exists
+
+A town is a hard test for a renderer and for a level layout at the same time. It
+has to hold a street of thirty shopfronts, interiors you can enter, a skyline
+that reads at sunset, and a player who must never get stuck in a doorway. This
+is a study in building all of that from primitives in code rather than from a
+modelling package.
+
+## What you can do
+
+- **Walk the town** on foot, in first person, at day or dusk.
+- **Enter the buildings**: the Mariposa, the Coronado, the General Store, the
+  Sheriff's Office, the Gazette, the chapel and the rest of the street.
+- **Climb the mesa** and look back at the town.
+- **Fast travel** from the town map, and read the compass and place cards as you
+  arrive somewhere.
+- **Meet the hosts**: around thirty ambient characters on looping beats, Dolores
+  by the general store among them.
+- **Play on a phone**, where a stick and buttons appear automatically.
 
 ## Running it
 
 ```bash
-npm install --omit=dev     # optional: only pulls in `ws` for the multiplayer relay
+npm install --omit=dev     # optional, only pulls ws for the multiplayer relay
 node server.js             # http://localhost:3000
 ```
 
-`PORT` and `HOST` are read from the environment (defaults `3000` / `0.0.0.0`).
+`PORT` and `HOST` are read from the environment, defaulting to 3000 and
+0.0.0.0.
 
 ## Controls
 
-| | |
+| Key | Action |
 |---|---|
 | `W A S D` | Move |
 | `Shift` | Run |
 | `Ctrl` | Crouch |
 | `Space` | Jump |
-| Mouse | Look (click to capture the pointer) |
+| Mouse | Look, click to capture the pointer |
 | `E` | Interact |
 | `T` | Lantern |
-| `M` | Town map (click a marker to fast-travel) |
-| `Esc` | Pause / settings |
-| `F3` | Performance stats |
+| `M` | Town map, click a marker to fast travel |
+| `Esc` | Pause and settings |
+| `F3` | Performance statistics |
 
-Touch devices get an on-screen stick and buttons automatically.
+## What is not here
 
-## What's in the town
+- There is no story, no mission and no combat. It is a place to walk around.
+- The multiplayer relay is a small presence channel, not a game server. Nothing
+  is persisted.
+- The town is not an exact recreation of the set. It is built from the readable
+  parts: the street plan, the shopfront names and the silhouette.
+- Textures are CC0 ambient sets and the skies are Poly Haven captures; see
+  `public/assets/hdri/CREDITS.txt`.
 
-Every canonical location is placed and enterable — all 28 buildings:
-
-*Main Street* — Mariposa Saloon, Coronado Hotel & Restaurant, Sweetwater Bank & Trust,
-H. Sharp General Store, The Sweetwater Gazette, The Sheriff's Office, Dr. O'Rourke,
-A. Mull Embalmer & Undertaker, Gunsmith, Sweetwater Post Office, Lehmer Bro. Clothing & Tailor,
-County Recording Office, Dillin & Foote, G. Benz Harness, Whitfield's Tip Top Sarsaparilla,
-Livery & Board, McIntyre Shipping & Freight, Sonski & Sons, McGinty Sash & Door Co.,
-Mining Exchange, Photographer's Shop, Cabinet & Window Carpentry, Men's Clothing & Tailor,
-Bakery & Restaurant, Delos Stables.
-
-Plus the **Train Platform** with its welcome arch, the **Sweetwater Chapel** and cemetery on the
-north edge, back-lot corrals and workshops, and ~30 ambient hosts on looping beats — Dolores by
-the general store, the photographer on Main Street, a bounty board by the sheriff's office,
-bartenders, piano players, clerks and riders.
-
-## How it's built
+## How it is built
 
 ```
 public/
-  index.html            loader, menu, HUD, map, settings panels
-  js/
-    main.js             boot sequence, game loop, keybinds
-    core/               Engine (renderer + post FX + quality presets), Assets, Audio, GradeShader
-    world/              Terrain, Sky, Builder, Buildings, Furnish, Props, Sweetwater, Hosts
-    player/Player.js    capsule collision, step-up, ramp climbing, coyote/jump buffering
-    ui/HUD.js           compass, toasts, place cards, map
-  assets/textures/      10 CC0 ambientCG PBR sets
-  assets/hdri/          Poly Haven skies (day + dusk)
-  assets/models/        horse.glb, stork.glb
-  vendor/three/         three.js r160 (module build + the examples we import)
-server.js               static server, ETag/brotli/gzip, SPA fallback
+  index.html            loader, menu, HUD, map, settings
+  js/main.js            boot sequence, game loop, keybinds
+  js/core/              renderer, post effects, quality presets, assets, audio
+  js/world/             terrain, sky, builder, buildings, props, hosts
+  js/player/Player.js   capsule collision, step-up, ramp climbing, jump buffer
+  js/ui/HUD.js          compass, toasts, place cards, map
+  assets/textures/      ten CC0 PBR sets
+  assets/hdri/          day and dusk skies
+  assets/models/        horse and stork
+  vendor/three/         three.js r160 with the examples it imports
+server.js               static server with ETag, brotli and SPA fallback
 ```
 
-The town is assembled by a small **MeshBuilder** DSL: primitives are declared in a transform stack,
-tagged with a material, and merged into a handful of draw calls. One `B.build()` call emits the whole
-town (~535k triangles in ~530 draw calls) plus its collider set and ramp list.
+The town is assembled by a small builder DSL: primitives are declared in a
+transform stack, tagged with a material and merged into a handful of draw calls.
+One build call emits the street, the interiors, the colliders and the ramp list.
 
-### Collision notes
+Two collision details carry the experience. Street dressing is laid down before
+the buildings and each shop keeps its footprint plus an approach corridor clear,
+so barrels and porch clutter can never seal a doorway. Stairs are drawn as
+treads but collide as a single slope, so the player glides up instead of catching
+a toe on each riser.
 
-The player is a capsule resolved axis-by-axis against an AABB spatial hash. Two details matter:
+### Tests
 
-* **Doorway keep-clear.** Street dressing is laid down *before* the buildings, and each shop clears
-  its footprint plus an approach corridor for clutter. Facade segments are tagged and preserved
-  during that sweep, so the broad path cannot erase solid wall panels or enlarge the designed
-  openings. Barrels, hitching rails and porch clutter can never seal a shop.
-* **Stairs are ramps.** Flights are drawn as discrete treads but collide as a single smooth slope,
-  so you glide up instead of catching a toe on every riser.
+`test/` holds the browser and unit checks: `smoke.mjs`, `browser-gameplay.mjs`,
+`browser-verify.mjs`, `hosts.test.mjs`, `mariposa.test.mjs`, `sky.test.mjs`,
+`compression.test.mjs`. Run one with `node test/smoke.mjs`.
 
-## Deploying to Render
+### Deploy
 
-**One click** — this is all you need:
+`render.yaml` and `DEPLOY.md` describe the Render deployment; `Procfile` is there
+for a plain process host.
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/GraphicMiles/sweetwater)
+## Licence
 
-That link opens Render's blueprint page with this repo pre-filled. `render.yaml` is read
-straight from `main`, so every setting is already correct — just click **Apply** (sign in or
-create a free account first). You'll get a URL like `https://sweetwater.onrender.com` and the
-build takes a couple of minutes.
-
-Manual path, if you prefer: **Render dashboard → New → Blueprint →** pick `GraphicMiles/sweetwater`.
-
-What the blueprint sets up:
-
-| Setting | Value |
-|---|---|
-| Runtime / plan | Node 20, free |
-| Build | `npm install --omit=dev` |
-| Start | `node server.js` |
-| Health check | `/healthz` |
-| Auto-deploy | on — pushes to `main` redeploy |
-
-Notes on the deployed build:
-
-* **Multiplayer is pinned off** (`NO_MULTIPLAYER=1`) to keep the free tier light. Set it to `0` in
-  `render.yaml` (or the dashboard) to bring the `ws` relay up.
-* The free plan sleeps after ~15 min idle; first request after that takes ~30 s to wake.
-* First load downloads ~12 MB of textures and HDRIs. They're served `Cache-Control: immutable`,
-  so only the first visit pays for it.
-* The sandbox bridge tools (`deploy/render-deploy.mjs`) can create and poll the service for you if
-  you set `RENDER_API_KEY`.
-
-## Multiplayer
-
-The relay is **stubbed but ready**. `server.js` looks for the optional `ws` package; if it's
-missing the server runs single-player and the client never tries to open a socket. Install it
-(`npm i ws`) and the Socket.IO-compatible relay comes up on the same port; set `NO_MULTIPLAYER=1`
-to force it off. `/api/info` reports `multiplayer: true|false`.
-
-## Testing
-
-Three layers, all runnable locally:
-
-```bash
-npm test              # 15 unit tests — geometry, Mariposa traversal, LODs, sky clock
-npm run test:browser  # 19 gameplay checks driven through headless Chrome
-npm run test:smoke    # boot audit — module graph, asset 404s, draw calls, console errors
-npm run test:capture  # screenshot set from eight scouted viewpoints
-```
-
-The browser tests boot the **real game** in headless Chrome. Two details matter:
-
-*Headless SwiftShader renders at roughly 0.1 fps*, so anything measured against the wall clock
-is meaningless. The gameplay suite therefore drives `player.update()` with fixed 1/120 s steps
-and asserts on simulation state, reserving wall-clock waits for the parts that genuinely need a
-painted frame (screenshots).
-
-The unit suite stubs `three` through `test/three-loader.mjs`, so world and player modules can be
-imported straight into Node with no browser and no DOM.
-
-Together the suites cover: walking/running/strafing, jump arc and landing, crouch (eye height and
-collision capsule), wall collision with zero penetration, gravity never dropping the player
-through the floor, host and district counts, the day/night cycle, and clean boot with no console
-errors or failed requests.
-
-## Credits
-
-* Textures — [ambientCG](https://ambientcg.com) (CC0)
-* Skies — [Poly Haven](https://polyhaven.com) (CC0)
-* Models — three.js examples (CC0)
-* three.js — MIT
-
-*Westworld* is a trademark of HBO / Warner Bros. Discovery. This is an unofficial, non-commercial
-fan recreation; no assets from the show are distributed here.
+MIT, see `LICENSE`.
