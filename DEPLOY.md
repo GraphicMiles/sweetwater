@@ -1,4 +1,4 @@
-# Deploy Sweetwater to Render — 3 steps
+# Deploy Sweetwater to Render - 3 steps
 
 ## The link
 
@@ -11,14 +11,14 @@ Click it. That's step 1.
 ## What happens when you click it
 
 Render opens its blueprint page with `GraphicMiles/sweetwater` already filled in. It reads
-`render.yaml` straight from `main`, so **every setting is already correct** — you don't have to
+`render.yaml` straight from `main`, so **every setting is already correct** - you don't have to
 type a build command, start command, or health check path.
 
 You'll see one service: `sweetwater`, Node 20, free plan, Oregon.
 
 1. Sign in (or create a free account).
 2. Give the service a name if you want something other than `sweetwater`
-   — this becomes your URL: `https://<name>.onrender.com`.
+   - this becomes your URL: `https://<name>.onrender.com`.
 3. Click **Apply**.
 
 The build runs `npm install --omit=dev` then `node server.js` and takes about two minutes.
@@ -29,7 +29,7 @@ When the status turns green and **Live**, open the URL.
 ## What to expect on first load
 
 * **~30 s wait** if the service was asleep. Free instances suspend after ~15 min idle.
-* **A few seconds of loading** — about 12 MB of PBR textures and HDRIs download once.
+* **A few seconds of loading** - about 12 MB of PBR textures and HDRIs download once.
   They're served `Cache-Control: immutable`, so it's cached after that.
 * Click **Arrive by Train** and you spawn on the Sweetwater Station platform facing
   north up Main Street.
@@ -44,13 +44,13 @@ When the status turns green and **Live**, open the URL.
 | Faster cold starts | Dashboard → upgrade off the free plan |
 | Region | `render.yaml` → `region:` (`frankfurt` for EU, `singapore` for Asia) |
 
-Pushes to `main` auto-redeploy — `autoDeployTrigger: commit` is already set.
+Pushes to `main` auto-redeploy - `autoDeployTrigger: commit` is already set.
 
 ---
 
 ## Want me to do it for you instead?
 
-I can create and monitor the service via the Render API, but I need a key — Render has no
+I can create and monitor the service via the Render API, but I need a key - Render has no
 unauthenticated API and, for obvious reasons, I can't log in as you.
 
 1. Get one: **dashboard.render.com → Account Settings → API Keys → Create API Key**
@@ -70,7 +70,7 @@ verifies `/healthz` and `/api/info` before printing your URL.
 
 ## Already verified before you click
 
-* `render.yaml` parses against the blueprint schema — no unknown or deprecated keys.
+* `render.yaml` parses against the blueprint schema - no unknown or deprecated keys.
   (It initially had `autoDeployTrigger: on`, which is invalid and would have failed
   validation; it's now `commit`.)
 * A clean clone with `npm install --omit=dev && node server.js` serves `/`, `/healthz`,
